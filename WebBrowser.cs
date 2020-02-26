@@ -1,4 +1,5 @@
 ﻿using CefSharp;
+using CefSharp.WinForms;
 using System;
 using System.Linq;
 using System.Windows.Forms;
@@ -57,7 +58,7 @@ namespace SolidCubes.WebUtils
 
         private static void Init_Cef()
         {
-            CefSettings settings = new CefSettings();
+            var settings = new CefSettings();
 
             // TODO: Implement Custom Scheme to avoid MessageBox Error and redirect to:  browser://error/notallowed.html
             //settings.RegisterScheme(new CefCustomScheme
@@ -66,8 +67,7 @@ namespace SolidCubes.WebUtils
             //    SchemeHandlerFactory = new SchemeHandlerFactory()
             //});
 
-            // Perform dependency check to make sure all relevant resources are in our output directory.
-            Cef.Initialize(settings, shutdownOnProcessExit: false, performDependencyCheck: true);
+            Cef.Initialize(settings);
         }
     }
 }

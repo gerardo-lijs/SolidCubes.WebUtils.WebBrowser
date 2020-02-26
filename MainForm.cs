@@ -34,28 +34,39 @@ namespace SolidCubes.WebUtils
 
             browser.LoadingStateChanged += Browser_LoadingStateChanged;
             browser.TitleChanged += Browser_TitleChanged;
-            browser.AddressChanged += Browser_URLChanged;
+            browser.AddressChanged += Browser_AddressChanged;
             browser.MenuHandler = new Handlers.CustomContextHandler();
             browser.LifeSpanHandler = new Handlers.LifeSpanHandler(this);
         }
 
-        public void Url_Load(string Url)
+        public void Url_Load(string url)
         {
-            browser.Load(Url);
+            browser.Load(url);
         }
 
-        private void Browser_URLChanged(object sender, AddressChangedEventArgs e)
+        private void Browser_AddressChanged(object sender, AddressChangedEventArgs e)
         {
             this.InvokeOnUiThreadIfRequired(() =>
             {
-                Check_DomainConstraint(e.Address);
+                if (!IsDomainAllowed(e.Address))
+                {
+                    // TODO: Show error when browser is hidden
+                    browser.Visible = false;
+
+                    // TODO: Language
+                    MessageBox.Show(text: $"Browsing not allowed to the following website: {browser.Address}" + Environment.NewLine + Environment.NewLine + "Click OK and the Browser will close.",
+                                    caption: "SolidCubes WebBrowser",
+                                    buttons: MessageBoxButtons.OK,
+                                    icon: MessageBoxIcon.Warning);
+                    Close();
+                }
 
                 Tx_Url.Text = e.Address;
 
                 SetCanGoBack(browser.CanGoBack);
                 SetCanGoForward(browser.CanGoForward);
 
-                Text = "Loading...";
+                Text = "SolidCubes WebBrowser - Loading...";
             });
         }
 
@@ -135,25 +146,6 @@ namespace SolidCubes.WebUtils
 
             // Not allowed
             return false;
-        }
-
-        private void Check_DomainConstraint(string urlAddress)
-        {
-            // TODO: Maybe it's possible to Block using CustomScheme or some decent code. For the time being, this low-quality code more or less works and get the job done
-
-            // Check constraints
-            if (!IsDomainAllowed(urlAddress))
-            {
-                this.InvokeOnUiThreadIfRequired(() =>
-                {
-                    // TODO: Language
-                    MessageBox.Show(text: $"Browsing not allowed to the following website: {browser.Address}" + Environment.NewLine + Environment.NewLine + "Click OK and the Browser will close.",
-                                    caption: "SolidCubes WebBrowser",
-                                    buttons: MessageBoxButtons.OK,
-                                    icon: MessageBoxIcon.Warning);
-                    Close();
-                });
-            }
         }
 
         private void SetCanGoBack(bool canGoBack) => this.InvokeOnUiThreadIfRequired(() => Bt_Back.Enabled = canGoBack);
