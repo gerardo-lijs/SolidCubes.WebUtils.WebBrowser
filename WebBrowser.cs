@@ -3,28 +3,48 @@ using CefSharp.WinForms;
 using System;
 using System.Linq;
 using System.Windows.Forms;
+using CommandLine;
+using System.Collections.Generic;
+using CommandLine.Text;
 
 namespace SolidCubes.WebUtils
 {
     public static class WebBrowser
     {
+        private class Options
+        {
+            [Option('s', "start-url", Default = true, Required = true, HelpText = "Start URL.")]
+            public string StarUrl { get; set; }
+
+            [Option('a', "allow", Required = true, HelpText = "Domains allowed to browse.")]
+            public IEnumerable<string> DomainsAllowed { get; set; }
+        }
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        internal static void Main()
+        internal static void Main(string[] args)
+        {
+            // Example: --start-url https://dotnet.microsoft.com --allow *.dotnet.microsoft.com
+            // Example: --start-url https://dotnet.microsoft.com --allow *.dotnet.microsoft.com *.microsoft.com
+
+            Parser.Default.ParseArguments<Options>(args)
+                .WithParsed(RunOptions)
+                .ThrowOnParseError();
+        }
+
+        static void RunOptions(Options opts)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // TODO: Get config from CommandLine Arguments
-
             // Test config
             var conf = new WebBrowserConfig
             {
-                StarUrl = "https://dotnet.microsoft.com/"
+                StarUrl = opts.StarUrl
             };
-            conf.DomainConstraint.Add("*.dotnet.microsoft.com");
+            conf.DomainsAllowed = new List<string>(opts.DomainsAllowed);
 
             // Init
             Init_Cef();
@@ -33,13 +53,42 @@ namespace SolidCubes.WebUtils
             Application.Run(new MainForm(conf));
         }
 
-        public static void Open(string startUrl, bool modal = false, params string[] domainConstraint)
+        public static ParserResult<T> ThrowOnParseError<T>(this ParserResult<T> result)
+        {
+            if (!(result is NotParsed<T>))
+            {
+                // Case with no errors needs to be detected explicitly, otherwise the .Select line will throw an InvalidCastException
+                return result;
+            }
+
+            var builder = SentenceBuilder.Create();
+            var errorMessages = HelpText.RenderParsingErrorsTextAsLines(result, builder.FormatError, builder.FormatMutuallyExclusiveSetErrors, 1);
+
+            var excList = errorMessages.Select(msg => new ArgumentException(msg)).ToList();
+
+            if (excList.Any())
+            {
+                var errorText = "Invalid command line parameters:\n";
+                foreach (var item in excList)
+                {
+                    errorText += "\n" + item.Message;
+                }
+                MessageBox.Show(text: errorText,
+                                caption: "SolidCubes WebBrowser",
+                                buttons: MessageBoxButtons.OK,
+                                icon: MessageBoxIcon.Error);
+            }
+
+            return result;
+        }
+
+        public static void Open(string startUrl, bool modal = false, params string[] domainsAllowed)
         {
             var conf = new WebBrowserConfig
             {
                 StarUrl = startUrl,
                 Modal = modal,
-                DomainConstraint = domainConstraint.ToList()
+                DomainsAllowed = domainsAllowed.ToList()
             };
 
             Open(conf);
@@ -59,13 +108,6 @@ namespace SolidCubes.WebUtils
         private static void Init_Cef()
         {
             var settings = new CefSettings();
-
-            // TODO: Implement Custom Scheme to avoid MessageBox Error and redirect to:  browser://error/notallowed.html
-            //settings.RegisterScheme(new CefCustomScheme
-            //{
-            //    SchemeName = SchemeHandlerFactory.SchemeNameBrowser,
-            //    SchemeHandlerFactory = new SchemeHandlerFactory()
-            //});
 
             Cef.Initialize(settings);
         }

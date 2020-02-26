@@ -15,7 +15,7 @@ namespace SolidCubes.WebUtils
         /// List of Allowed domains. You can user * as wilcard. Don't include http:// or https:// or / at then end. Just the domain.
         /// Example: github.com  /  *.google.com
         /// </summary>
-        public List<string> DomainConstraint { get; set; } = new List<string>();
+        public List<string> DomainsAllowed { get; set; } = new List<string>();
         public string WindowTitle { get; set; } = "SolidCubes WebBrowser";
     }
 }

@@ -104,7 +104,7 @@ namespace SolidCubes.WebUtils
 
         private bool IsDomainAllowed(string urlAddress)
         {
-            foreach (var item in _config.DomainConstraint)
+            foreach (var item in _config.DomainsAllowed)
             {
                 var strNewWeb = urlAddress;
                 var strPrefixFlex = item;
