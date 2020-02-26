@@ -37,5 +37,5 @@ If executed as Windows Application if uses Main and takes arguments from command
 	conf.Modal = true;
 	conf.DomainConstraint.Add("*.dotnet.microsoft.com");
 
-	WebBrowser.Open(conf);
+    WebBrowser.Open(conf);
 ```
