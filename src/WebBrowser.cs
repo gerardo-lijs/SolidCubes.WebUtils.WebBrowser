@@ -34,7 +34,7 @@ namespace SolidCubes.WebUtils
                 .ThrowOnParseError();
         }
 
-        static void RunOptions(Options opts)
+        private static void RunOptions(Options opts)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -73,6 +73,7 @@ namespace SolidCubes.WebUtils
                 {
                     errorText += "\n" + item.Message;
                 }
+                errorText += "\n\nExample: --start-url https://dotnet.microsoft.com --allow *.dotnet.microsoft.com";
                 MessageBox.Show(text: errorText,
                                 caption: "SolidCubes WebBrowser",
                                 buttons: MessageBoxButtons.OK,
