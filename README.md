@@ -24,7 +24,7 @@ If executed as Windows Application if uses Main and takes arguments from command
 ```csharp
     using SolidCubes.WebUtils;
 
-    WebBrowser.Open("https://dotnet.microsoft.com", modal: true, domainConstraint: "*.dotnet.microsoft.com")		// Modal and limited to test.com domain and subdomains
+    WebBrowser.Open("https://dotnet.microsoft.com", modal: true, domainConstraint: "*.dotnet.microsoft.com")
 ```
 
 ## Run with custom config class
