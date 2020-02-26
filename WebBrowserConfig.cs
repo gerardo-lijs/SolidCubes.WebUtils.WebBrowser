@@ -4,10 +4,10 @@ namespace SolidCubes.WebUtils
 {
     public sealed class WebBrowserConfig
     {
-        //TODO: AllowPopUp? Same Window? New Window?
-        //TODO: AllowContextMenu?
-        //TODO: Print?
-        //TODO: etc, etc
+        // TODO: AllowPopUp? Same Window? New Window?
+        // TODO: AllowContextMenu?
+        // TODO: Print?
+        // TODO: etc, etc
 
         public string StarUrl { get; set; }
         public bool Modal { get; set; }

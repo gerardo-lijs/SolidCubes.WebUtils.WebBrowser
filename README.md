@@ -23,7 +23,7 @@ Highlights:
 
     using SolidCubes.WebUtils;
 
-    WebBrowser.Open("www.test.com", true, "*.test.com")		//Modal and limited to test.com domain and subdomains
+    WebBrowser.Open("www.test.com", true, "*.test.com")		// Modal and limited to test.com domain and subdomains
 
 4) Run with custom config class
 

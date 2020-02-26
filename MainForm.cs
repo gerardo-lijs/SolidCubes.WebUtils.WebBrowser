@@ -15,17 +15,17 @@ namespace SolidCubes.WebUtils
         {
             InitializeComponent();
 
-            //save config
+            // Save config
             _config = config;
 
-            this.Text = config.WindowTitle;
-            this.Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            Text = config.WindowTitle;
+            Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath);
 
-            //controls
+            // Controls
             Tx_Url.ReadOnly = true;
             Tx_Url.BackColor = System.Drawing.SystemColors.Window;
 
-            //browser
+            // Browser
             browser = new ChromiumWebBrowser(config.StarUrl)
             {
                 Dock = DockStyle.Fill,
@@ -55,7 +55,7 @@ namespace SolidCubes.WebUtils
                 SetCanGoBack(browser.CanGoBack);
                 SetCanGoForward(browser.CanGoForward);
 
-                this.Text = "Loading...";
+                Text = "Loading...";
             });
         }
 
@@ -63,7 +63,7 @@ namespace SolidCubes.WebUtils
         {
             this.InvokeOnUiThreadIfRequired(() =>
             {
-                this.Text = $"SolidCubes WebBrowser - {e.Title}";
+                Text = $"SolidCubes WebBrowser - {e.Title}";
             });
         }
 
@@ -82,7 +82,7 @@ namespace SolidCubes.WebUtils
             }
             else
             {
-                //enable buttons
+                // Enable buttons
                 this.InvokeOnUiThreadIfRequired(() =>
                 {
                     Bt_Refresh.Visible = true;
@@ -91,98 +91,84 @@ namespace SolidCubes.WebUtils
             }
         }
 
-        private void Check_DomainConstraint(string UrlAddress)
+        private bool IsDomainAllowed(string urlAddress)
         {
-            //TODO: Maybe it's possible to Block using CustomScheme or some decent code. For the time being, this low-quality code more or less works and get the job done
-
-            bool bAllowed = false;
-
-            //Check Constraints
             foreach (var item in _config.DomainConstraint)
             {
-                string strNewWeb = browser.Address;
-                string strPrefixFlex = item;
+                var strNewWeb = urlAddress;
+                var strPrefixFlex = item;
 
-                //Flex Method
+                // Flex Method
                 if (item.Contains("*"))
                 {
-                    //Remove http / https
+                    // Remove http / https
                     strNewWeb = strNewWeb.Replace("http://", "");
                     strNewWeb = strNewWeb.Replace("https://", "");
 
-                    //Split
+                    // Split
                     if (strNewWeb.Contains("/"))
                     {
                         strNewWeb = strNewWeb.Split('/')[0];
                     }
 
-                    strPrefixFlex = strPrefixFlex.Replace("*", "");
+                    strPrefixFlex = strPrefixFlex.Replace("*.", string.Empty);
 
-                    //Compare
-                    strNewWeb = strNewWeb.Substring(strNewWeb.Length - strPrefixFlex.Length);
+                    // Compare
+                    if (strNewWeb.EndsWith(strPrefixFlex))
+                    {
+                        // Allowed
+                        return true;
+                    }
                 }
                 else
                 {
-                    //Compare
+                    // Compare
                     strNewWeb = strNewWeb.Substring(0, Math.Min(strNewWeb.Length, strPrefixFlex.Length));
                 }
 
                 if (strNewWeb == strPrefixFlex)
                 {
-                    bAllowed = true;
-                    break;
+                    // Allowed
+                    return true;
                 }
             }
 
-            //check constraints
-            if (!bAllowed)
+            // Not allowed
+            return false;
+        }
+
+        private void Check_DomainConstraint(string urlAddress)
+        {
+            // TODO: Maybe it's possible to Block using CustomScheme or some decent code. For the time being, this low-quality code more or less works and get the job done
+
+            // Check constraints
+            if (!IsDomainAllowed(urlAddress))
             {
                 this.InvokeOnUiThreadIfRequired(() =>
                 {
-                    //TODO: Language
+                    // TODO: Language
                     MessageBox.Show(text: $"Browsing not allowed to the following website: {browser.Address}" + Environment.NewLine + Environment.NewLine + "Click OK and the Browser will close.",
                                     caption: "SolidCubes WebBrowser",
                                     buttons: MessageBoxButtons.OK,
                                     icon: MessageBoxIcon.Warning);
-                    this.Close();
+                    Close();
                 });
             }
         }
 
-        private void SetCanGoBack(bool canGoBack)
-        {
-            this.InvokeOnUiThreadIfRequired(() => Bt_Back.Enabled = canGoBack);
-        }
+        private void SetCanGoBack(bool canGoBack) => this.InvokeOnUiThreadIfRequired(() => Bt_Back.Enabled = canGoBack);
 
-        private void SetCanGoForward(bool canGoForward)
-        {
-            this.InvokeOnUiThreadIfRequired(() => Bt_Forward.Enabled = canGoForward);
-        }
+        private void SetCanGoForward(bool canGoForward) => this.InvokeOnUiThreadIfRequired(() => Bt_Forward.Enabled = canGoForward);
 
-        private void Bt_Back_Click(object sender, EventArgs e)
-        {
-            browser.Back();
-        }
+        private void Bt_Back_Click(object sender, EventArgs e) => browser.Back();
 
-        private void Bt_Forward_Click(object sender, EventArgs e)
-        {
-            browser.Forward();
-        }
+        private void Bt_Forward_Click(object sender, EventArgs e) => browser.Forward();
 
-        private void Bt_Print_Click(object sender, EventArgs e)
-        {
-            browser.Print();
-        }
+        private void Bt_Print_Click(object sender, EventArgs e) => browser.Print();
 
-        private void Bt_Refresh_Click(object sender, EventArgs e)
-        {
-            browser.Load(browser.Address);
-        }
+        private void Bt_Refresh_Click(object sender, EventArgs e) => browser.Load(browser.Address);
 
-        private void Bt_Stop_Click(object sender, EventArgs e)
-        {
-            browser.Stop();
-        }
+        private void Bt_Stop_Click(object sender, EventArgs e) => browser.Stop();
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {

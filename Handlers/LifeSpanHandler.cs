@@ -28,7 +28,7 @@ namespace SolidCubes.WebUtils.Handlers
 
         public bool OnBeforePopup(IWebBrowser browserControl, IBrowser browser, IFrame frame, string targetUrl, string targetFrameName, WindowOpenDisposition targetDisposition, bool userGesture, IPopupFeatures popupFeatures, IWindowInfo windowInfo, IBrowserSettings browserSettings, ref bool noJavascriptAccess, out IWebBrowser newBrowser)
         {
-            //TODO: Allow some popups? Open in New tab? Filter  mailto:  and others ? For now it works...
+            // TODO: Allow some popups? Open in New tab? Filter  mailto:  and others ? For now it works...
 
             myForm.Url_Load(targetUrl);
             newBrowser = null;

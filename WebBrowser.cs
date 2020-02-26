@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace SolidCubes.WebUtils
 {
-    public class WebBrowser
+    public static class WebBrowser
     {
         /// <summary>
         /// The main entry point for the application.
@@ -16,26 +16,30 @@ namespace SolidCubes.WebUtils
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            //TODO: Get config from CommandLine Arguments
+            // TODO: Get config from CommandLine Arguments
 
-            //test config
-            var conf = new WebBrowserConfig();
-            conf.StarUrl = "http://www.asp.net/";
-            conf.DomainConstraint.Add("*.asp.net");
+            // Test config
+            var conf = new WebBrowserConfig
+            {
+                StarUrl = "https://dotnet.microsoft.com/"
+            };
+            conf.DomainConstraint.Add("*.dotnet.microsoft.com");
 
-            //init
+            // Init
             Init_Cef();
 
-            //run
+            // Run
             Application.Run(new MainForm(conf));
         }
 
-        public static void Open(string StartUrl, bool Modal = false, params string[] DomainConstraint)
+        public static void Open(string startUrl, bool modal = false, params string[] domainConstraint)
         {
-            var conf = new WebBrowserConfig();
-            conf.StarUrl = StartUrl;
-            conf.Modal = Modal;
-            conf.DomainConstraint = DomainConstraint.ToList();
+            var conf = new WebBrowserConfig
+            {
+                StarUrl = startUrl,
+                Modal = modal,
+                DomainConstraint = domainConstraint.ToList()
+            };
 
             Open(conf);
         }
@@ -55,14 +59,14 @@ namespace SolidCubes.WebUtils
         {
             CefSettings settings = new CefSettings();
 
-            //TODO: Implement Custom Scheme to avoid MessageBox Error and redirect to:  browser://error/notallowed.html
+            // TODO: Implement Custom Scheme to avoid MessageBox Error and redirect to:  browser://error/notallowed.html
             //settings.RegisterScheme(new CefCustomScheme
             //{
             //    SchemeName = SchemeHandlerFactory.SchemeNameBrowser,
             //    SchemeHandlerFactory = new SchemeHandlerFactory()
             //});
 
-            //Perform dependency check to make sure all relevant resources are in our output directory.
+            // Perform dependency check to make sure all relevant resources are in our output directory.
             Cef.Initialize(settings, shutdownOnProcessExit: false, performDependencyCheck: true);
         }
     }
