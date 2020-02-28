@@ -29,9 +29,16 @@ namespace SolidCubes.WebUtils
             // Example: --start-url https://dotnet.microsoft.com --allow *.dotnet.microsoft.com
             // Example: --start-url https://dotnet.microsoft.com --allow *.dotnet.microsoft.com *.microsoft.com
 
-            Parser.Default.ParseArguments<Options>(args)
-                .WithParsed(RunOptions)
-                .ThrowOnParseError();
+            try
+            {
+                Parser.Default.ParseArguments<Options>(args)
+                    .WithParsed(RunOptions)
+                    .ThrowOnParseError();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
 
         private static void RunOptions(Options opts)
@@ -108,6 +115,7 @@ namespace SolidCubes.WebUtils
 
         private static void Init_Cef()
         {
+            // NOTE: Also requires C++ Redist 2015 to work.
             var settings = new CefSettings();
 
             Cef.Initialize(settings);
